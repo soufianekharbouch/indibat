@@ -6,10 +6,14 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\RapportController;
 use App\Http\Controllers\ComportementController;
 use App\Http\Controllers\ConseilController;
-
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\EleveController;
+use App\Http\Controllers\StatistiqueController;
+use App\Http\Controllers\StatistiqueVisiteController;
+use App\Http\Controllers\ProfilController;
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('home');
 
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
@@ -22,6 +26,7 @@ Route::middleware(['auth'])->group(function () {
     
     Route::get('/rapport/create/{eleve}', [RapportController::class, 'create'])->name('rapport.create');
     Route::post('/rapport', [RapportController::class, 'store'])->name('rapport.store');
+    Route::get('/rapport/confirmation/{rapport}', [RapportController::class, 'confirmation'])->name('rapport.confirmation'); // Nouvelle route
     
     // Routes pour les conseils de discipline
     Route::get('/conseils', [ConseilController::class, 'index'])->name('conseils.index');
@@ -33,15 +38,18 @@ Route::middleware(['auth'])->group(function () {
      Route::get('/mes-rapports', [RapportController::class, 'mesRapports'])->name('mes-rapports');
     Route::get('/mes-conseils', [ConseilController::class, 'mesConseils'])->name('mes-conseils');
     Route::get('/liste-profs', [UserController::class, 'listeProfs'])->name('liste-profs');
-    Route::get('/statistiques', [DashboardController::class, 'statistiques'])->name('statistiques');
-    
-    // Routes pour la gestion des comportements (root seulement)
-    Route::middleware(['can:root'])->group(function () {
-        Route::get('/comportements', [ComportementController::class, 'index'])->name('comportements.index');
-        Route::get('/comportements/create', [ComportementController::class, 'create'])->name('comportements.create');
-        Route::post('/comportements', [ComportementController::class, 'store'])->name('comportements.store');
-        Route::get('/comportements/{comportement}/edit', [ComportementController::class, 'edit'])->name('comportements.edit');
-        Route::put('/comportements/{comportement}', [ComportementController::class, 'update'])->name('comportements.update');
-        Route::delete('/comportements/{comportement}', [ComportementController::class, 'destroy'])->name('comportements.destroy');
-    });
+    Route::get('/statistiques', [StatistiqueController::class, 'index'])->name('statistiques');
+    Route::get('/eleves/upload', [EleveController::class, 'showUploadForm'])->name('eleves.upload.form');
+    Route::post('/eleves/upload', [EleveController::class, 'uploadEleves'])->name('eleves.upload');
+    Route::get('/eleves', [EleveController::class, 'index'])->name('eleves.index');
+
+    Route::get('/statistiques-visites', [StatistiqueVisiteController::class, 'index'])->name('statistiques-visites.index');
+    Route::get('/statistiques-visites/details', [StatistiqueVisiteController::class, 'details'])->name('statistiques-visites.details');
+
+    Route::get('/profil/change-password', [ProfilController::class, 'showChangePasswordForm'])->name('profil.change-password');
+    Route::post('/profil/change-password', [ProfilController::class, 'changePassword'])->name('profil.change-password');
+
+    Route::get('/users/upload', [UserController::class, 'showUploadForm'])->name('users.upload.form');
+    Route::post('/users/upload', [UserController::class, 'uploadUsers'])->name('users.upload');
+
 });

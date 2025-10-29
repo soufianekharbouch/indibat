@@ -17,7 +17,7 @@ class Comportement extends Model
     ];
 
     protected $casts = [
-        'points_retires' => 'integer'
+        'points_retires' => 'decimal:2'
     ];
 
     // Événement pour recalculer tous les rapports quand les points changent
@@ -35,7 +35,7 @@ class Comportement extends Model
         static::saved(function ($comportement) {
             if ($comportement->wasChanged('points_retires')) {
                 // Optionnel: logger le changement
-                \Log::info("Points du comportement {$comportement->nom_fr} modifiés, recalcul des rapports déclenché");
+                \Log::info("Points du comportement {$comportement->nom_ar} modifiés, recalcul des rapports déclenché");
             }
         });
     }

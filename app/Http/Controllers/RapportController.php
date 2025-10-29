@@ -13,7 +13,7 @@ class RapportController extends Controller
     public function create($eleveId)
     {
         $eleve = Eleve::findOrFail($eleveId);
-        $comportements = Comportement::all();
+        $comportements = Comportement::orderBy('points_retires', 'desc')->get(); // Trier par points
         
         // Vérifier les contraintes
         $constraints = Rapport::checkConstraints($eleveId, auth()->id());
@@ -36,6 +36,7 @@ class RapportController extends Controller
             'heure_seance' => 'required',
             'matiere' => 'required|string',
             'comportements' => 'required|array',
+            'comportements.*' => 'exists:comportements,id',
             'notes_additionnelles' => 'nullable|string'
         ]);
 
@@ -49,17 +50,17 @@ class RapportController extends Controller
         }
 
         // Calculer les points retirés basés sur les comportements sélectionnés
-        $pointsRetires = 0;
+        $pointsRetires = 0.00;
         $comportementsSelectionnes = Comportement::whereIn('id', $request->comportements)->get();
         
         foreach ($comportementsSelectionnes as $comportement) {
-            $pointsRetires += $comportement->points_retires;
+            $pointsRetires += floatval($comportement->points_retires);
         }
 
         // Récupérer les noms français des comportements
-        $nomsComportements = $comportementsSelectionnes->pluck('nom_fr')->toArray();
+        $nomsComportements = $comportementsSelectionnes->pluck('nom_ar')->toArray();
 
-        Rapport::create([
+        $rapport = Rapport::create([
             'eleve_id' => $request->eleve_id,
             'prof_id' => auth()->id(),
             'date_seance' => $request->date_seance,
@@ -70,7 +71,19 @@ class RapportController extends Controller
             'points_retires' => $pointsRetires
         ]);
 
-        return redirect()->route('dashboard')->with('success', 'تم إرسال التقرير بنجاح.');
+        // Redirection vers la page de confirmation au lieu du dashboard
+        return redirect()->route('rapport.confirmation', $rapport->id);
+    }
+
+    // Nouvelle méthode pour afficher la page de confirmation
+    public function confirmation(Rapport $rapport)
+    {
+        // Vérifier que l'utilisateur a le droit de voir ce rapport
+        if (auth()->id() !== $rapport->prof_id) {
+            abort(403);
+        }
+
+        return view('rapports.confirmation', compact('rapport'));
     }
 
     // Nouvelle méthode pour vérifier les contraintes via AJAX
@@ -90,13 +103,24 @@ class RapportController extends Controller
             'days_remaining' => $daysRemaining
         ]);
     }
+
     public function mesRapports()
-        {
-            $rapports = Rapport::with('eleve')
-                ->where('prof_id', auth()->id())
+    {
+        $user = auth()->user();
+        
+        if ($user->isAdmin() || $user->isRoot()) {
+            // Pour les admins: afficher tous les rapports avec les relations
+            $rapports = Rapport::with(['eleve', 'prof'])
                 ->orderBy('created_at', 'desc')
                 ->get();
-
-            return view('rapports.mes-rapports', compact('rapports'));
+        } else {
+            // Pour les profs: afficher seulement leurs rapports
+            $rapports = Rapport::with('eleve')
+                ->where('prof_id', $user->id)
+                ->orderBy('created_at', 'desc')
+                ->get();
         }
+
+        return view('rapports.mes-rapports', compact('rapports'));
+    }
 }

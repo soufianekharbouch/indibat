@@ -31,9 +31,9 @@ class Eleve extends Model
     // Accessor pour calculer le score dynamiquement basé sur les rapports
     public function getScoreDisciplineCalculeAttribute()
     {
-        $scoreInitial = 100;
+        $scoreInitial = 100.00;
         $pointsRetires = $this->rapports->sum('points_retires');
-        return max(0, $scoreInitial - $pointsRetires);
+        return max(0.00, $scoreInitial - $pointsRetires);
     }
 
     // Méthode pour recalculer tous les scores (à utiliser quand les points des comportements changent)

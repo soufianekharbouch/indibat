@@ -24,6 +24,7 @@ class Rapport extends Model
     protected $casts = [
         'comportements' => 'array',
         'date_seance' => 'date',
+        'points_retires' => 'decimal:2'
     ];
 
     // Événement pour recalculer les points si les comportements changent
@@ -53,7 +54,7 @@ class Rapport extends Model
     public function getComportementsArAttribute()
     {
         $comportementsAr = [];
-        $comportementsModel = Comportement::all()->keyBy('nom_fr');
+        $comportementsModel = Comportement::all()->keyBy('nom_ar');
         
         foreach ($this->comportements as $comportement) {
             if (isset($comportementsModel[$comportement])) {
@@ -69,8 +70,8 @@ class Rapport extends Model
     // Calculer les points retirés basés sur les comportements actuels
     public function calculerPointsRetires()
     {
-        $points = 0;
-        $comportementsModel = Comportement::all()->keyBy('nom_fr');
+        $points = 0.00;
+        $comportementsModel = Comportement::all()->keyBy('nom_ar');
         
         foreach ($this->comportements as $comportement) {
             if (isset($comportementsModel[$comportement])) {
@@ -85,11 +86,11 @@ class Rapport extends Model
     public static function recalculerTousLesPoints()
     {
         $rapports = self::all();
-        $comportementsModel = Comportement::all()->keyBy('nom_fr');
-        $updatedCount = 0;
+        $comportementsModel = Comportement::all()->keyBy('nom_ar');
+        $updatedCount = 0.00;
 
         foreach ($rapports as $rapport) {
-            $nouveauxPoints = 0;
+            $nouveauxPoints = 0.00;
             
             foreach ($rapport->comportements as $comportement) {
                 if (isset($comportementsModel[$comportement])) {

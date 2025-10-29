@@ -18,6 +18,22 @@
     </nav>
 
     <div class="container mx-auto p-4">
+        <!-- Message de confirmation après soumission d'avis -->
+        @if(session('avis_soumis'))
+        <div class="mb-6 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg shadow">
+            <div class="flex items-center">
+                <svg class="w-6 h-6 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <div>
+                    <h3 class="font-bold text-lg">شكراً لك على مشاركتك!</h3>
+                    <p class="text-sm">تم استلام رأيك بنجاح وسيتم أخذه بعين الاعتبار من قبل الإدارة.</p>
+                    <p class="text-xs mt-1">نقدر لك مساهمتك القيمة في تحسين الانضباط المدرسي.</p>
+                </div>
+            </div>
+        </div>
+        @endif
+
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- معلومات المجلس -->
             <div class="lg:col-span-2 space-y-6">
@@ -41,7 +57,7 @@
                         </div>
                         
                         <div>
-                            <label class="font-bold text-gray-700">السبب الرئيسي:</label>
+                            <label class="font-bold text-gray-700">دواعي عقد المجلس:</label>
                             <p class="mt-1 p-2 bg-gray-50 rounded">{{ $conseil->raison_principale }}</p>
                         </div>
                         
@@ -97,12 +113,17 @@
                         @if($conseil->reponses->where('a_repondu', true)->count() > 0)
                         <div class="space-y-4">
                             @foreach($conseil->reponses->where('a_repondu', true) as $reponse)
-                            <div class="border-l-4 border-blue-500 pl-4 bg-blue-50 p-4 rounded">
+                            <div class="border-l-4 {{ $reponse->prof_id === auth()->id() ? 'border-purple-500 bg-purple-50' : 'border-blue-500 bg-blue-50' }} pl-4 p-4 rounded">
                                 @if(auth()->user()->isAdmin() || auth()->user()->isRoot())
                                 <!-- Pour les admins: afficher tous les détails -->
                                 <div class="flex justify-between items-start mb-2">
                                     <div>
-                                        <h4 class="font-bold text-lg">{{ $reponse->prof->prenom }} {{ $reponse->prof->nom }}</h4>
+                                        <h4 class="font-bold text-lg">
+                                            {{ $reponse->prof->prenom }} {{ $reponse->prof->nom }}
+                                            @if($reponse->prof_id === auth()->id())
+                                            <span class="text-purple-600 text-sm">(أنت)</span>
+                                            @endif
+                                        </h4>
                                         <p class="text-sm text-gray-600">{{ $reponse->prof->matiere }}</p>
                                     </div>
                                     <span class="text-sm text-gray-500 bg-white px-2 py-1 rounded">
@@ -110,9 +131,18 @@
                                     </span>
                                 </div>
                                 @else
-                                <!-- Pour les profs qui ont répondu: afficher seulement l'avis sans informations personnelles -->
-                                <div class="mb-2">
-                                    <h4 class="font-bold text-lg text-gray-700">رأي مقدم</h4>
+                                <!-- Pour les profs qui ont répondu -->
+                                <div class="flex justify-between items-start mb-2">
+                                    <div>
+                                        @if($reponse->prof_id === auth()->id())
+                                        <h4 class="font-bold text-lg text-purple-700">رأيي</h4>
+                                        @else
+                                        <h4 class="font-bold text-lg text-gray-700"></h4>
+                                        @endif
+                                    </div>
+                                    <span class="text-sm text-gray-500 bg-white px-2 py-1 rounded">
+                                        {{ $reponse->repondu_le->format('d/m/Y H:i') }}
+                                    </span>
                                 </div>
                                 @endif
                                 <div class="mt-3">
@@ -214,7 +244,7 @@
                     @if(auth()->user()->isProf() && $conseil->profs->contains(auth()->id()) && !$conseil->profARepondu(auth()->id()))
                     <div id="donner-avis" class="bg-white p-6 rounded-lg shadow">
                         <h3 class="text-lg font-bold mb-4 text-green-600">إبداء رأيك</h3>
-                        <form method="POST" action="{{ route('conseils.donner-avis', $conseil->id) }}">
+                        <form method="POST" action="{{ route('conseils.donner-avis', $conseil->id) }}" id="avisForm">
                             @csrf
                             <div class="mb-4">
                                 <label class="block text-sm font-medium text-gray-700 mb-2">الاقتراح المناسب</label>
@@ -240,6 +270,19 @@
                                 إرسال الرأي
                             </button>
                         </form>
+                        
+                        <!-- Message de confirmation caché -->
+                        <div id="confirmationMessage" class="hidden mt-4 bg-green-50 border border-green-200 rounded-lg p-4">
+                            <div class="flex items-center">
+                                <svg class="w-6 h-6 text-green-600 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <div>
+                                    <h4 class="font-bold text-green-800">شكراً لك على مشاركتك!</h4>
+                                    <p class="text-sm text-green-700">تم استلام رأيك بنجاح وسيتم أخذه بعين الاعتبار من قبل الإدارة.</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     @endif
 
@@ -255,13 +298,7 @@
                                           class="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-red-500 focus:border-red-500"
                                           placeholder="أدخل القرار النهائي للمجلس بناءً على آراء الأساتذة..."></textarea>
                             </div>
-                            <div class="mb-4">
-                                <label class="flex items-center p-2 bg-yellow-50 rounded border border-yellow-200">
-                                    <input type="checkbox" name="reinitialiser_score" class="ml-2">
-                                    <span class="font-medium">إعادة تعيين نقاط الانضباط للطالب</span>
-                                </label>
-                                <p class="text-xs text-gray-500 mt-1">سيتم حذف جميع التقارير السابقة وإعادة نقاط الانضباط إلى 100</p>
-                            </div>
+
                             <button type="submit" 
                                     class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 flex items-center justify-center">
                                 <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -280,15 +317,6 @@
                             <div>
                                 <label class="font-bold text-gray-700">القرار النهائي:</label>
                                 <p class="mt-1 p-3 bg-green-50 rounded border border-green-200">{{ $conseil->decision_finale }}</p>
-                            </div>
-                            <div>
-                                <label class="font-bold text-gray-700">إعادة تعيين النقاط:</label>
-                                <span class="px-3 py-1 rounded-full text-sm {{ $conseil->reinitialiser_score ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
-                                    {{ $conseil->reinitialiser_score ? 'نعم' : 'لا' }}
-                                </span>
-                                @if($conseil->reinitialiser_score)
-                                <p class="text-xs text-green-600 mt-1">تم حذف جميع التقارير السابقة وإعادة النقاط إلى 100</p>
-                                @endif
                             </div>
                             <div class="pt-3 border-t border-gray-200">
                                 <p class="text-sm text-gray-500">تم إغلاق المجلس في: {{ $conseil->updated_at->format('d/m/Y H:i') }}</p>
@@ -371,5 +399,27 @@
             </div>
         </div>
     </div>
+
+    <script>
+        // Gestion de la soumission du formulaire d'avis
+        document.addEventListener('DOMContentLoaded', function() {
+            const avisForm = document.getElementById('avisForm');
+            const confirmationMessage = document.getElementById('confirmationMessage');
+            
+            if (avisForm) {
+                avisForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    // Afficher le message de confirmation
+                    confirmationMessage.classList.remove('hidden');
+                    
+                    // Soumettre le formulaire après un délai
+                    setTimeout(() => {
+                        avisForm.submit();
+                    }, 3000); // 3 secondes pour lire le message
+                });
+            }
+        });
+    </script>
 </body>
 </html>

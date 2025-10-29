@@ -1,4 +1,3 @@
-
 @extends('layouts.app')
 
 @section('title', 'لوحة التحكم - إنضباط')
@@ -37,83 +36,185 @@
         </div>
         @endif
 
-        <div class="bg-white rounded-lg shadow">
+        <div class="bg-white rounded-lg shadow overflow-hidden">
             <div class="p-4 border-b">
                 <h2 class="text-lg font-bold">قائمة مجالس الانضباط</h2>
             </div>
+            
+            @if(auth()->user()->isProf())
+            <!-- Vue simplifiée pour les professeurs -->
             <div class="overflow-x-auto">
                 <table class="w-full">
                     <thead class="bg-gray-50">
                         <tr>
-                            <th class="px-6 py-3 text-right">الطالب</th>
-                            <th class="px-6 py-3 text-right">الحالة</th>
-                            <th class="px-6 py-3 text-right">الردود</th>
-                            <th class="px-6 py-3 text-right">تاريخ الإنشاء</th>
-                            @if(auth()->user()->isAdmin() || auth()->user()->isRoot())
-                            <th class="px-6 py-3 text-right">أنشئ بواسطة</th>
-                            @endif
-                            <th class="px-6 py-3 text-right">الإجراءات</th>
+                            <th class="px-4 py-3 text-right text-sm font-medium text-gray-700">الطالب</th>
+                            <th class="px-4 py-3 text-right text-sm font-medium text-gray-700">الحالة</th>
+                            <th class="px-4 py-3 text-right text-sm font-medium text-gray-700">الردود</th>
+                            <th class="px-4 py-3 text-right text-sm font-medium text-gray-700">تاريخ الإنشاء</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200">
                         @foreach($conseils as $conseil)
-                        <tr>
-                            <td class="px-6 py-4">
-                                <div class="font-bold">{{ $conseil->eleve->nom_ar }} {{ $conseil->eleve->prenom_ar }}</div>
-                                <div class="text-sm text-gray-600">{{ $conseil->eleve->classe }}</div>
+                        <tr data_url="{{ route('conseils.show', $conseil->id) }}" 
+                            class="hover:bg-gray-50 cursor-pointer transition duration-200 conseil-row"
+                            data-conseil-id="{{ $conseil->id }}">
+                            <td class="px-4 py-4">
+                                <div class="font-bold text-gray-900">{{ $conseil->eleve->nom_ar }} {{ $conseil->eleve->prenom_ar }}</div>
+                                <div class="text-sm text-gray-600 mt-1">{{ $conseil->eleve->classe }}</div>
+                                <div class="text-xs text-gray-500">{{ $conseil->eleve->code_massar }}</div>
                             </td>
-                            <td class="px-6 py-4">
+                            <td class="px-4 py-4">
                                 @if($conseil->statut === 'ouvert')
-                                    <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
-                                        مفتوح
-                                    </span>
-                                    @if($conseil->est_en_retard)
-                                    <span class="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs mt-1 block">
-                                        متأخر
-                                    </span>
-                                    @endif
+                                    <div class="flex flex-col items-start space-y-1">
+                                        <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-bold">
+                                            مفتوح
+                                        </span>
+                                        @if($conseil->est_en_retard)
+                                        <span class="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs">
+                                            متأخر
+                                        </span>
+                                        @endif
+                                        @if(!$conseil->prof_a_repondu)
+                                        <span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs">
+                                            ⚡ بانتظار رأيك
+                                        </span>
+                                        @endif
+                                    </div>
                                 @else
                                     <span class="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs">
                                         مغلق
                                     </span>
                                 @endif
                             </td>
-                            <td class="px-6 py-4">
-                                <span class="text-sm">
-                                    {{ $conseil->nombre_reponses }}/{{ $conseil->total_profs }}
-                                </span>
+                            <td class="px-4 py-4">
+                                <div class="flex flex-col items-center">
+                                    <span class="text-lg font-bold {{ $conseil->nombre_reponses == $conseil->total_profs ? 'text-green-600' : ($conseil->nombre_reponses > 0 ? 'text-blue-600' : 'text-gray-600') }}">
+                                        {{ $conseil->nombre_reponses }}/{{ $conseil->total_profs }}
+                                    </span>
+                                    <span class="text-xs text-gray-500 mt-1">إجابة</span>
+                                </div>
                             </td>
-                            <td class="px-6 py-4">
-                                <span class="text-sm">{{ $conseil->created_at->format('d/m/Y') }}</span>
-                            </td>
-                            @if(auth()->user()->isAdmin() || auth()->user()->isRoot())
-                            <td class="px-6 py-4">
-                                <span class="text-sm">{{ $conseil->admin->prenom }} {{ $conseil->admin->nom }}</span>
-                            </td>
-                            @endif
-                            <td class="px-6 py-4">
-                                <a href="{{ route('conseils.show', $conseil->id) }}" 
-                                   class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm">
-                                   عرض
-                                </a>
-                                @if(auth()->user()->isProf() && $conseil->statut === 'ouvert' && !$conseil->prof_a_repondu)
-                                <a href="{{ route('conseils.show', $conseil->id) }}" 
-                                   class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm">
-                                   إبداء الرأي
-                                </a>
-                                @endif
-                                @if((auth()->user()->isAdmin() || auth()->user()->isRoot()) && $conseil->statut === 'ouvert')
-                                <a href="{{ route('conseils.show', $conseil->id) }}" 
-                                   class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm">
-                                   إغلاق
-                                </a>
-                                @endif
+                            <td class="px-4 py-4">
+                                <div class="text-sm text-gray-900">{{ $conseil->created_at->format('d/m/Y') }}</div>
+                                <div class="text-xs text-gray-500">{{ $conseil->created_at->format('H:i') }}</div>
                             </td>
                         </tr>
                         @endforeach
                     </tbody>
                 </table>
             </div>
+            @else
+            <!-- Vue complète pour les admins et root -->
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-3 text-right text-sm font-medium text-gray-700">الطالب</th>
+                            <th class="px-4 py-3 text-right text-sm font-medium text-gray-700">الحالة</th>
+                            <th class="px-4 py-3 text-right text-sm font-medium text-gray-700">الردود</th>
+                            <th class="px-4 py-3 text-right text-sm font-medium text-gray-700">تاريخ الإنشاء</th>
+                            <th class="px-4 py-3 text-right text-sm font-medium text-gray-700">أنشئ بواسطة</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        @foreach($conseils as $conseil)
+                        <tr data_url="{{ route('conseils.show', $conseil->id) }}" 
+                            class="hover:bg-gray-50 cursor-pointer transition duration-200 conseil-row"
+                            data-conseil-id="{{ $conseil->id }}">
+                            <td class="px-4 py-4">
+                                <div class="font-bold text-gray-900">{{ $conseil->eleve->nom_ar }} {{ $conseil->eleve->prenom_ar }}</div>
+                                <div class="text-sm text-gray-600 mt-1">{{ $conseil->eleve->classe }}</div>
+                                <div class="text-xs text-gray-500">{{ $conseil->eleve->code_massar }}</div>
+                            </td>
+                            <td class="px-4 py-4">
+                                @if($conseil->statut === 'ouvert')
+                                    <div class="flex flex-col items-start space-y-1">
+                                        <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-bold">
+                                            مفتوح
+                                        </span>
+                                        @if($conseil->est_en_retard)
+                                        <span class="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs">
+                                            متأخر
+                                        </span>
+                                        @endif
+                                        <span class="text-xs text-gray-600">
+                                            {{ $conseil->jours_restants }} يوم متبقي
+                                        </span>
+                                    </div>
+                                @else
+                                    <div class="flex flex-col items-start">
+                                        <span class="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs">
+                                            مغلق
+                                        </span>
+                                        <span class="text-xs text-gray-500 mt-1">
+                                            {{ $conseil->updated_at->format('d/m/Y') }}
+                                        </span>
+                                    </div>
+                                @endif
+                            </td>
+                            <td class="px-4 py-4">
+                                <div class="flex flex-col items-center">
+                                    <span class="text-lg font-bold {{ $conseil->nombre_reponses == $conseil->total_profs ? 'text-green-600' : ($conseil->nombre_reponses > 0 ? 'text-blue-600' : 'text-red-600') }}">
+                                        {{ $conseil->nombre_reponses }}/{{ $conseil->total_profs }}
+                                    </span>
+                                    <span class="text-xs text-gray-500 mt-1">إجابة</span>
+                                    @if($conseil->statut === 'ouvert')
+                                    <span class="text-xs {{ $conseil->nombre_reponses == $conseil->total_profs ? 'text-green-600' : 'text-orange-600' }} font-bold mt-1">
+                                        {{ $conseil->total_profs - $conseil->nombre_reponses }} متبقي
+                                    </span>
+                                    @endif
+                                </div>
+                            </td>
+                            <td class="px-4 py-4">
+                                <div class="text-sm text-gray-900">{{ $conseil->created_at->format('d/m/Y') }}</div>
+                                <div class="text-xs text-gray-500">{{ $conseil->created_at->format('H:i') }}</div>
+                            </td>
+                            <td class="px-4 py-4">
+                                <div class="text-sm text-gray-900">{{ $conseil->admin->prenom }} {{ $conseil->admin->nom }}</div>
+                                <div class="text-xs text-gray-500">{{ $conseil->admin->matiere }}</div>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+            @endif
         </div>
     </div>
+
+    <script>
+        // Gestion du clic sur les lignes des conseils
+        document.addEventListener('DOMContentLoaded', function() {
+            const conseilRows = document.querySelectorAll('.conseil-row');
+            
+            conseilRows.forEach(row => {
+                row.addEventListener('click', function() {
+                    const conseilUrl = this.getAttribute('data_url');
+                    window.location.href = conseilUrl;
+                });
+            });
+        });
+    </script>
+
+    <style>
+        /* Styles pour améliorer l'affichage mobile */
+        @media (max-width: 768px) {
+            .conseil-row td {
+                padding: 12px 8px;
+            }
+            
+            .conseil-row .text-lg {
+                font-size: 1.125rem;
+            }
+        }
+        
+        /* Amélioration de l'expérience tactile sur mobile */
+        .conseil-row {
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .conseil-row:active {
+            background-color: #f3f4f6;
+        }
+    </style>
 @endsection
