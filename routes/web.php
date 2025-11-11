@@ -11,6 +11,7 @@ use App\Http\Controllers\EleveController;
 use App\Http\Controllers\StatistiqueController;
 use App\Http\Controllers\StatistiqueVisiteController;
 use App\Http\Controllers\ProfilController;
+use App\Http\Controllers\DecisionController;
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
@@ -51,5 +52,11 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/users/upload', [UserController::class, 'showUploadForm'])->name('users.upload.form');
     Route::post('/users/upload', [UserController::class, 'uploadUsers'])->name('users.upload');
+
+    Route::get('/decisions/create/{eleve}', [DecisionController::class, 'create'])->name('decisions.create');
+    Route::post('/decisions', [DecisionController::class, 'store'])->name('decisions.store');
+
+    Route::post('/rapports/{rapport}/mark-seen', [RapportController::class, 'markSeen'])
+    ->name('rapports.mark-seen');
 
 });

@@ -78,12 +78,20 @@ class RapportController extends Controller
     // Nouvelle méthode pour afficher la page de confirmation
     public function confirmation(Rapport $rapport)
     {
-        // Vérifier que l'utilisateur a le droit de voir ce rapport
-        if (auth()->id() !== $rapport->prof_id) {
-            abort(403);
-        }
 
         return view('rapports.confirmation', compact('rapport'));
+    }
+    public function markSeen($id)
+    {
+        $rapport = Rapport::findOrFail($id);
+
+        if (auth()->user()->isAdmin() || auth()->user()->isMotasarrif()) {
+            $rapport->vu_par_admin = true;
+            $rapport->save();
+            return back()->with('success', 'تم تأكيد الاطلاع على التقرير من طرف الإدارة');
+        }
+
+        abort(403, 'غير مصرح');
     }
 
     // Nouvelle méthode pour vérifier les contraintes via AJAX

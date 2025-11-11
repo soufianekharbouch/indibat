@@ -22,7 +22,10 @@ class Eleve extends Model
     {
         return $this->hasMany(Rapport::class);
     }
-
+    public function decisions()
+    {
+        return $this->hasMany(\App\Models\Decision::class);
+    }
     public function getNomCompletAttribute()
     {
         return $this->nom_ar . ' ' . $this->prenom_ar;

@@ -6,6 +6,13 @@
     <title>@yield('title', 'إنضباط')</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
+      <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Tajawal', serif;
+        }
+    </style>
 <body class="bg-gray-100">
     <!-- Navigation Bar -->
     <nav class="bg-blue-600 text-white p-3">
@@ -300,5 +307,38 @@
             background: #a8a8a8;
         }
     </style>
+    <!-- WhatsApp Floating Help Button -->
+<div id="whatsapp-helper" 
+     class="fixed bottom-6 left-6 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-lg p-4 flex items-center space-x-2 space-x-reverse cursor-pointer transition-all duration-300 z-50">
+    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 14h.01M16 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+    <span class="hidden md:inline text-sm font-medium">مساعدة / اقتراحات</span>
+    <button id="close-whatsapp-helper" 
+            class="absolute -top-2 -right-2 bg-white text-green-700 rounded-full w-5 h-5 flex items-center justify-center text-xs shadow hover:bg-gray-100">
+        ×
+    </button>
+</div>
+
+<script>
+    // Numéro WhatsApp et message par défaut
+    const whatsappNumber = "212601940479";
+    const defaultMessage = encodeURIComponent("السلام عليكم، أحتاج مساعدة بخصوص استخدام تطبيق إنضباط أو أود تقديم اقتراح لتحسينه.");
+
+    // Ouvrir WhatsApp
+    document.getElementById("whatsapp-helper").addEventListener("click", function(e) {
+        // Empêcher clic sur bouton X d'ouvrir le lien
+        if (e.target.id === "close-whatsapp-helper") return;
+        const url = `https://wa.me/${whatsappNumber}?text=${defaultMessage}`;
+        window.open(url, "_blank");
+    });
+
+    // Fermer le bouton flottant
+    document.getElementById("close-whatsapp-helper").addEventListener("click", function(e) {
+        e.stopPropagation();
+        document.getElementById("whatsapp-helper").style.display = "none";
+    });
+</script>
+
 </body>
 </html>

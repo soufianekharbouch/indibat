@@ -6,6 +6,13 @@
     <title>تقرير جديد - إنضباط</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
+      <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Tajawal', serif;
+        }
+    </style>
 <body class="bg-gray-100">
     <nav class="bg-blue-600 text-white p-4">
         <div class="container mx-auto flex justify-between items-center">

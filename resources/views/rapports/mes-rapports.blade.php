@@ -212,31 +212,34 @@
         </div>
     </div>
 </div>
-
+@php
+$rapportsJs = [];
+foreach($rapports as $r){
+    $rapportsJs[$r->id] = [
+        'eleve' => $r->eleve ? [
+            'id'           => $r->eleve->id,
+            'nom_complet'  => ($r->eleve->prenom_ar ?? '').' '.($r->eleve->nom_ar ?? ''),
+            'classe'       => $r->eleve->classe,
+            'code_massar'  => $r->eleve->code_massar,
+        ] : null,
+        'prof' => $r->prof ? [
+            'nom_complet'  => ($r->prof->prenom ?? '').' '.($r->prof->nom ?? ''),
+            'email'        => $r->prof->email,
+        ] : null,
+        'matiere'             => $r->matiere,
+        'date_seance'         => $r->date_seance ? \Carbon\Carbon::parse($r->date_seance)->format('d/m/Y') : null,
+        'heure_seance'        => $r->heure_seance,
+        'points_retires'      => (float) $r->points_retires,
+        'comportements'       => is_array($r->comportements) ? $r->comportements : [],
+        'notes_additionnelles'=> $r->notes_additionnelles,
+        'created_at'          => $r->created_at?->format('d/m/Y H:i'),
+    ];
+}
+@endphp
 <script>
-    // Données des rapports pour la popup
-    const rapportsData = {
-        @foreach($rapports as $rapport)
-        {{ $rapport->id }}: {
-            eleve: @json($rapport->eleve ? [
-                'nom_complet' => $rapport->eleve->prenom_ar . ' ' . $rapport->eleve->nom_ar,
-                'classe' => $rapport->eleve->classe,
-                'code_massar' => $rapport->eleve->code_massar
-            ] : null),
-            prof: @json($rapport->prof ? [
-                'nom_complet' => $rapport->prof->prenom . ' ' . $rapport->prof->nom,
-                'email' => $rapport->prof->email
-            ] : null),
-            matiere: "{{ $rapport->matiere }}",
-            date_seance: "{{ \Carbon\Carbon::parse($rapport->date_seance)->format('d/m/Y') }}",
-            heure_seance: "{{ $rapport->heure_seance }}",
-            points_retires: {{ $rapport->points_retires }},
-            comportements: @json($rapport->comportements ?? []),
-            notes_additionnelles: "{{ $rapport->notes_additionnelles }}",
-            created_at: "{{ $rapport->created_at->format('d/m/Y H:i') }}"
-        },
-        @endforeach
-    };
+const rapportsData = @json($rapportsJs);
+</script>
+<script>
 
     // Gestion du clic sur les lignes
     document.addEventListener('DOMContentLoaded', function() {
@@ -290,7 +293,7 @@
                     ${rapport.comportements && rapport.comportements.length > 0 
                         ? rapport.comportements.map(comportement => 
                             `<span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm">${comportement}</span>`
-                          ).join('')
+                        ).join('')
                         : '<p class="text-gray-500 text-sm">لا توجد سلوكيات مسجلة</p>'
                     }
                 </div>
@@ -315,6 +318,16 @@
                 <h4 class="font-bold text-gray-700 mb-2">معلومات التقرير</h4>
                 <p class="text-sm"><strong>تاريخ الإرسال:</strong> ${rapport.created_at}</p>
             </div>
+
+            <!-- 🔹 Nouveau bouton vers le profil de l'élève -->
+            ${rapport.eleve ? `
+            <div class="mt-6 flex justify-center">
+                <a href="/eleve/${rapport.eleve.id}" 
+                class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg shadow transition duration-300">
+                    عرض ملف التلميذ
+                </a>
+            </div>
+            ` : ''}
         `;
 
         document.getElementById('rapportModal').classList.remove('hidden');

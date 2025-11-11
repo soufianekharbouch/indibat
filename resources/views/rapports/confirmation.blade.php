@@ -6,6 +6,13 @@
     <title>تأكيد الإرسال - إنضباط</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+
+<style>
+    body {
+        font-family: 'Tajawal', serif;
+    }
+</style>
 <body class="bg-gray-100">
     <nav class="bg-green-600 text-white p-4">
         <div class="container mx-auto flex justify-between items-center">
@@ -78,12 +85,16 @@
             <!-- Actions -->
             <div class="flex flex-col md:flex-row gap-4 justify-center">
                 <a href="{{ route('dashboard') }}" 
-                   class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg text-center transition duration-300">
-                   العودة للرئيسية
+                class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg text-center transition duration-300">
+                العودة للرئيسية
                 </a>
                 <a href="{{ route('mes-rapports') }}" 
-                   class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg text-center transition duration-300">
-                   عرض جميع تقاريري
+                class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg text-center transition duration-300">
+                عرض جميع تقاريري
+                </a>
+                <a href="{{ route('eleve.show', $rapport->eleve->id) }}" 
+                class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg text-center transition duration-300">
+                عرض ملف التلميذ
                 </a>
             </div>
 

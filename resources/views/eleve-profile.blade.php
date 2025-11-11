@@ -6,6 +6,11 @@
     <title>ملف الطالب - إنضباط</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+    body { font-family: 'Tajawal', serif; }
+</style>
+
 <body class="bg-gray-100">
     <nav class="bg-blue-600 text-white p-3">
         <div class="container mx-auto flex justify-between items-center">
@@ -32,8 +37,34 @@
             </div>
         </div>
 
-        <!-- Bouton pour créer un rapport (pour les profs seulement) -->
-        @if(auth()->user()->isProf())
+        {{-- أزرار الإنشاء بحسب الدور --}}
+        @if(auth()->user()->isMotasarrif())
+            <div class="mb-4 text-center">
+                <a href="{{ route('decisions.create', $eleve->id) }}"
+                   class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300 inline-flex items-center text-sm">
+                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M8 12h.01M12 12h.01M16 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    اتخاذ إجراء إداري
+                </a>
+                <p class="text-xs text-gray-600 mt-1">يمكنك إضافة قرار إداري مرتبط بهذا التلميذ</p>
+            </div>
+
+        @elseif(auth()->user()->isAdmin())
+            <div class="mb-4 text-center">
+                <a href="{{ route('conseils.create', $eleve->id) }}"
+                   class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300 inline-flex items-center text-sm">
+                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                    إنشاء مجلس تأديبي
+                </a>
+                <p class="text-xs text-gray-600 mt-1">يمكنك بدء مجلس تأديبي لهذا التلميذ</p>
+            </div>
+
+        @elseif(auth()->user()->isProf())
             @php
                 $constraints = \App\Models\Rapport::checkConstraints($eleve->id, auth()->id());
                 $canCreateRapport = $constraints['can_create'];
@@ -41,270 +72,313 @@
             @endphp
 
             @if($canCreateRapport)
-            <div class="mb-4 text-center">
-                <a href="{{ route('rapport.create', $eleve->id) }}" 
-                   class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300 inline-flex items-center text-sm">
-                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                    </svg>
-                    إنشاء تقرير جديد
-                </a>
-                <p class="text-xs text-gray-600 mt-1">يمكنك إنشاء تقرير انضباط جديد لهذا الطالب</p>
-            </div>
+                <div class="mb-4 text-center">
+                    <a href="{{ route('rapport.create', $eleve->id) }}" 
+                       class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300 inline-flex items-center text-sm">
+                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        إنشاء تقرير جديد
+                    </a>
+                    <p class="text-xs text-gray-600 mt-1">يمكنك إنشاء تقرير انضباط جديد لهذا الطالب</p>
+                </div>
             @else
-            <div class="mb-4 bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-                <div class="flex items-center">
-                    <svg class="w-5 h-5 text-yellow-600 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
-                    </svg>
-                    <div>
-                        <p class="text-sm text-yellow-800 font-medium">
-                            انتظر حتى {{ $nextAllowedDate }} لإنشاء تقرير جديد لهذا الطالب
-                        </p>
+                <div class="mb-4 bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                    <div class="flex items-center">
+                        <svg class="w-5 h-5 text-yellow-600 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                        </svg>
+                        <div>
+                            <p class="text-sm text-yellow-800 font-medium">
+                                انتظر حتى {{ $nextAllowedDate }} لإنشاء تقرير جديد لهذا الطالب
+                            </p>
+                        </div>
                     </div>
                 </div>
-            </div>
             @endif
         @endif
 
-        <!-- Section unifiée des événements -->
+        {{-- دمج كل الأحداث: تقارير (أحمر) + مجالس (أخضر/أصفر) + قرارات إدارية (أصفر) --}}
         @php
             $evenements = collect();
-            
+
+            // تقارير
             foreach ($eleve->rapports as $rapport) {
                 $evenements->push([
                     'type' => 'rapport',
                     'data' => $rapport,
                     'date_reference' => $rapport->date_seance ?? $rapport->created_at,
-                    'created_at' => $rapport->created_at
+                    'created_at' => $rapport->created_at,
                 ]);
             }
-            
+
+            // مجالس
             foreach ($eleve->conseils as $conseil) {
                 $evenements->push([
                     'type' => 'conseil',
                     'data' => $conseil,
                     'date_reference' => $conseil->created_at,
-                    'created_at' => $conseil->created_at
+                    'created_at' => $conseil->created_at,
                 ]);
             }
-            
-            $evenementsTries = $evenements->sortBy('date_reference');
-        @endphp
-        
+
+            // قرارات إدارية
+            @endphp
+            @if(method_exists($eleve, 'decisions'))
+            @php
+                foreach ($eleve->decisions as $decision) {
+                    $evenements->push([
+                        'type' => 'decision',
+                        'data' => $decision,
+                        'date_reference' => $decision->decision_date ?? $decision->created_at,
+                        'created_at' => $decision->created_at,
+                    ]);
+                }
+            @endphp
+            @endif
+
+            @php
+                // من الأقدم إلى الأحدث
+                $evenementsTries = $evenements->sortBy('date_reference');
+            @endphp
+
         <div class="bg-white p-4 rounded-lg shadow">
-            <h3 class="text-lg font-bold mb-3">السجل الزمني للانضباط 
+            <h3 class="text-lg font-bold mb-3">
+                السجل الزمني للانضباط
                 <span class="text-xs font-normal text-gray-600">(من الأقدم إلى الأحدث)</span>
             </h3>
-            
+
             @if($evenementsTries->count() > 0)
-            <div class="space-y-4">
-                @foreach($evenementsTries as $evenement)
-                    @if($evenement['type'] === 'rapport')
-                        <!-- Affichage d'un rapport -->
-                        @php $rapport = $evenement['data']; @endphp
-                        <div class="border-l-3 border-red-500 pr-3 bg-red-50 p-3 rounded">
-                            <div class="flex justify-between items-start mb-2">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center">
-                                        <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
-                                        </svg>
+                <div class="space-y-4">
+                    @foreach($evenementsTries as $evenement)
+
+                        {{-- بطاقة تقرير (أحمر) --}}
+                        @if($evenement['type'] === 'rapport')
+                            @php $rapport = $evenement['data']; @endphp
+                            <div class="border-l-3 border-red-500 pr-3 bg-red-50 p-3 rounded">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center">
+                                            <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <h4 class="font-bold text-base">تقرير - {{ $rapport->matiere }}</h4>
+                                            <p class="text-xs text-gray-600">
+                                                {{ optional($rapport->date_seance)->format('d/m/Y') ?? $rapport->created_at->format('d/m/Y') }}
+                                                @if(!empty($rapport->heure_seance)) - {{ $rapport->heure_seance }} @endif
+                                            </p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <h4 class="font-bold text-base">تقرير - {{ $rapport->matiere }}</h4>
-                                        <p class="text-xs text-gray-600">
-                                            {{ $rapport->date_seance->format('d/m/Y') }} - {{ $rapport->heure_seance }}
+                                    <div class="text-right">
+                                        <span class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-bold">
+                                            -{{ number_format($rapport->points_retires, 2) }}
+                                        </span>
+                                        <p class="text-xs text-gray-500 mt-1">
+                                            {{ $rapport->created_at->format('d/m/Y') }}
                                         </p>
                                     </div>
+
+
                                 </div>
-                                <div class="text-right">
-                                    <span class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-bold">
-                                        -{{ number_format($rapport->points_retires, 2) }}
-                                    </span>
-                                    <p class="text-xs text-gray-500 mt-1">
-                                        {{ $rapport->created_at->format('d/m/Y') }}
+
+                                @if(auth()->user()->isRoot() || auth()->user()->isAdmin() || auth()->user()->isMotasarrif())
+                                    <p class="text-xs text-gray-500 mb-2">
+                                        الأستاذ: {{ $rapport->prof->prenom }} {{ $rapport->prof->nom }}
+                                        @if($rapport->prof_id === auth()->id())
+                                            <span class="text-blue-600">(أنت)</span>
+                                        @endif
                                     </p>
+                                @else
+                                    <p class="text-xs text-gray-500 mb-2">
+                                        {{ $rapport->matiere }}
+                                        @if($rapport->prof_id === auth()->id())
+                                            <span class="text-green-600">• تقريرك</span>
+                                        @endif
+                                    </p>
+                                @endif
+
+                                <div class="mt-2">
+                                    <p class="text-xs font-medium text-gray-700 mb-1">السلوكيات:</p>
+                                    <div class="flex flex-wrap gap-1">
+                                        @if(isset($rapport->comportements_ar) && is_array($rapport->comportements_ar))
+                                            @foreach($rapport->comportements_ar as $comportementAr)
+                                                <span class="bg-red-200 text-red-800 px-1 py-0.5 rounded text-xs">{{ $comportementAr }}</span>
+                                            @endforeach
+                                        @elseif(is_array($rapport->comportements))
+                                            @foreach($rapport->comportements as $comportement)
+                                                <span class="bg-red-200 text-red-800 px-1 py-0.5 rounded text-xs">{{ $comportement }}</span>
+                                            @endforeach
+                                        @endif
+                                    </div>
+                                    @if($rapport->notes_additionnelles)
+                                        <p class="text-xs mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded">
+                                            <strong>ملاحظات:</strong> {{ $rapport->notes_additionnelles }}
+                                        </p>
+                                    @endif
+
+                                    @if(auth()->user()->isAdmin() || auth()->user()->isMotasarrif())
+                                        <form method="POST" action="{{ route('rapports.mark-seen', $rapport->id) }}" class="mt-2 text-left">
+                                            @csrf
+                                            @if(!$rapport->vu_par_admin)
+                                                <button type="submit" 
+                                                        class="bg-blue-500 hover:bg-blue-600 text-white text-xs px-3 py-1 rounded transition duration-200">
+                                                    تأكيد الاطلاع من طرف الإدارة
+                                                </button>
+                                            @else
+                                                <span class="text-green-700 text-xs font-medium">
+                                                    ✅ تم الاطلاع على هذا التقرير من طرف الإدارة
+                                                </span>
+                                            @endif
+                                        </form>
+                                    @endif
+                                    @if(auth()->user()->isProf() && $rapport->vu_par_admin)
+                                        <span class="text-green-600 text-xs font-semibold">✔ تم الإطلاع على هذا التقرير من طرف الإدارة</span>
+                                    @endif
+
                                 </div>
                             </div>
-                            
-                            @if(auth()->user()->isRoot() || auth()->user()->isAdmin() || auth()->user()->isMotasarrif())
-                            <p class="text-xs text-gray-500 mb-2">
-                                الأستاذ: {{ $rapport->prof->prenom }} {{ $rapport->prof->nom }}
-                                @if($rapport->prof_id === auth()->id())
-                                <span class="text-blue-600">(أنت)</span>
-                                @endif
-                            </p>
-                            @else
-                            <p class="text-xs text-gray-500 mb-2">
-                                {{ $rapport->matiere }}
-                                @if($rapport->prof_id === auth()->id())
-                                <span class="text-green-600">• تقريرك</span>
-                                @endif
-                            </p>
-                            @endif
 
-                            <div class="mt-2">
-                                <p class="text-xs font-medium text-gray-700 mb-1">السلوكيات:</p>
-                                <div class="flex flex-wrap gap-1">
-                                    @if(isset($rapport->comportements_ar) && is_array($rapport->comportements_ar))
-                                        @foreach($rapport->comportements_ar as $comportementAr)
-                                        <span class="bg-red-200 text-red-800 px-1 py-0.5 rounded text-xs">
-                                            {{ $comportementAr }}
+                        {{-- بطاقة مجلس (أصفر/أخضر) --}}
+                        @elseif($evenement['type'] === 'conseil')
+                            @php $conseil = $evenement['data']; @endphp
+                            <div class="border-l-3 {{ $conseil->statut === 'ouvert' ? 'border-yellow-500 bg-yellow-50' : 'border-green-500 bg-green-50' }} pr-3 p-3 rounded">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-6 h-6 {{ $conseil->statut === 'ouvert' ? 'bg-yellow-500' : 'bg-green-500' }} rounded-full flex items-center justify-center">
+                                            <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                      d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <h4 class="font-bold text-base">
+                                                مجلس انضباط 
+                                                @if($conseil->statut === 'ouvert')
+                                                    <span class="text-yellow-600">(جاري)</span>
+                                                @else
+                                                    <span class="text-green-600">(مغلق)</span>
+                                                @endif
+                                            </h4>
+                                            <p class="text-xs text-gray-600">{{ $conseil->created_at->format('d/m/Y') }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col items-end gap-1">
+                                        <span class="px-1 py-0.5 rounded-full text-xs 
+                                            {{ $conseil->statut === 'ouvert' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800' }}">
+                                            {{ $conseil->statut === 'ouvert' ? 'مفتوح' : 'مغلق' }}
                                         </span>
-                                        @endforeach
-                                    @elseif(is_array($rapport->comportements))
-                                        @foreach($rapport->comportements as $comportement)
-                                        <span class="bg-red-200 text-red-800 px-1 py-0.5 rounded text-xs">
-                                            {{ $comportement }}
-                                        </span>
-                                        @endforeach
+                                        <a href="{{ route('conseils.show', $conseil->id) }}" 
+                                           class="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded text-xs text-center">
+                                           التفاصيل
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <div class="text-xs text-gray-600 mb-2">
+                                    <div class="mb-1">
+                                        <strong>السبب:</strong> {{ $conseil->raison_principale }}
+                                    </div>
+                                    @if($conseil->description)
+                                        <div><strong>الوصف:</strong> {{ \Illuminate\Support\Str::limit($conseil->description, 100) }}</div>
                                     @endif
                                 </div>
-                                @if($rapport->notes_additionnelles)
-                                <p class="text-xs mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded">
-                                    <strong>ملاحظات:</strong> {{ $rapport->notes_additionnelles }}
-                                </p>
-                                @endif
-                            </div>
-                        </div>
 
-                    @elseif($evenement['type'] === 'conseil')
-                        <!-- Affichage d'un conseil -->
-                        @php $conseil = $evenement['data']; @endphp
-                        <div class="border-l-3 {{ $conseil->statut === 'ouvert' ? 'border-yellow-500 bg-yellow-50' : 'border-green-500 bg-green-50' }} pr-3 p-3 rounded">
-                            <div class="flex justify-between items-start mb-2">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-6 h-6 {{ $conseil->statut === 'ouvert' ? 'bg-yellow-500' : 'bg-green-500' }} rounded-full flex items-center justify-center">
-                                        <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                                        </svg>
+                                @if($conseil->statut === 'ferme' && $conseil->decision_finale)
+                                    <div class="mt-2 p-2 bg-white rounded border {{ $conseil->reinitialiser_score ? 'border-green-200 bg-green-25' : 'border-gray-200' }}">
+                                        <p class="font-bold text-gray-700 text-xs mb-1">القرار النهائي:</p>
+                                        <p class="text-gray-800 text-xs">{{ \Illuminate\Support\Str::limit($conseil->decision_finale, 120) }}</p>
                                     </div>
-                                    <div>
-                                        <h4 class="font-bold text-base">
-                                            مجلس انضباط 
-                                            @if($conseil->statut === 'ouvert')
-                                            <span class="text-yellow-600">(جاري)</span>
-                                            @else
-                                            <span class="text-green-600">(مغلق)</span>
-                                            @endif
-                                        </h4>
-                                        <p class="text-xs text-gray-600">
-                                            {{ $conseil->created_at->format('d/m/Y') }}
-                                        </p>
+                                @endif
+
+                                @if(auth()->user()->isProf() && $conseil->statut === 'ouvert' && $conseil->profs->contains(auth()->id()) && !$conseil->profARepondu(auth()->id()))
+                                    <div class="mt-2 text-center">
+                                        <a href="{{ route('conseils.show', $conseil->id) }}" 
+                                           class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-xs inline-block">
+                                           إبداء الرأي
+                                        </a>
                                     </div>
-                                </div>
-                                <div class="flex flex-col items-end gap-1">
-                                    <span class="px-1 py-0.5 rounded-full text-xs 
-                                        {{ $conseil->statut === 'ouvert' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800' }}">
-                                        {{ $conseil->statut === 'ouvert' ? 'مفتوح' : 'مغلق' }}
-                                    </span>
-                                    <a href="{{ route('conseils.show', $conseil->id) }}" 
-                                       class="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded text-xs text-center">
-                                       التفاصيل
-                                    </a>
-                                </div>
-                            </div>
-                            
-                            <div class="text-xs text-gray-600 mb-2">
-                                <div class="mb-1">
-                                    <strong>السبب:</strong> {{ $conseil->raison_principale }}
-                                </div>
-                                @if($conseil->description)
-                                <div>
-                                    <strong>الوصف:</strong> {{ \Illuminate\Support\Str::limit($conseil->description, 100) }}
-                                </div>
                                 @endif
                             </div>
 
-                            @if($conseil->statut === 'ferme' && $conseil->decision_finale)
-                            <div class="mt-2 p-2 bg-white rounded border {{ $conseil->reinitialiser_score ? 'border-green-200 bg-green-25' : 'border-gray-200' }}">
-                                <p class="font-bold text-gray-700 text-xs mb-1">القرار النهائي:</p>
-                                <p class="text-gray-800 text-xs">{{ \Illuminate\Support\Str::limit($conseil->decision_finale, 120) }}</p>
-                            </div>
-                            @endif
+                        {{-- بطاقة قرار إداري (أصفر) --}}
+                        @elseif($evenement['type'] === 'decision')
+                            @php $decision = $evenement['data']; @endphp
+                            <div class="border-l-3 border-yellow-500 pr-3 bg-yellow-50 p-3 rounded">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center">
+                                            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                      d="M8 12h.01M12 12h.01M16 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <h4 class="font-bold text-base">إجراء إداري</h4>
+                                            <div class="text-xs text-gray-600 mt-1">
+                                                السيد الحارس العام 
+                                                ({{ $decision->motasarrif->prenom }} {{ $decision->motasarrif->nom }})
+                                            </div>
+                                            <p class="text-xs text-gray-600">
+                                                {{ optional($decision->decision_date)->format('d/m/Y') ?? $decision->created_at->format('d/m/Y') }}
+                                                @if(!empty($decision->decision_time)) - {{ $decision->decision_time }} @endif
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-bold">قرار</span>
+                                        <p class="text-xs text-gray-500 mt-1">{{ $decision->created_at->format('d/m/Y') }}</p>
+                                    </div>
+                                </div>
 
-                            @if(auth()->user()->isProf() && $conseil->statut === 'ouvert' && $conseil->profs->contains(auth()->id()) && !$conseil->profARepondu(auth()->id()))
-                            <div class="mt-2 text-center">
-                                <a href="{{ route('conseils.show', $conseil->id) }}" 
-                                   class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-xs inline-block">
-                                   إبداء الرأي
-                                </a>
+                                <div class="mt-2 text-xs text-gray-800">
+                                    @php $choices = is_array($decision->choices ?? null) ? $decision->choices : []; @endphp
+                                    @if(!empty($choices))
+                                        <div class="flex flex-wrap gap-1 mb-2">
+                                            @foreach($choices as $c)
+                                                <span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded">{{ $c }}</span>
+                                            @endforeach
+                                        </div>
+                                    @endif
+
+                                    @if($decision->details)
+                                        <div class="bg-white rounded p-2 border border-yellow-100 text-gray-700">
+                                            {{ $decision->details }}
+                                        </div>
+                                    @endif
+                                </div>
                             </div>
-                            @endif
-                        </div>
-                    @endif
-                @endforeach
-            </div>
+                        @endif
+
+                    @endforeach
+                </div>
             @else
-            <div class="text-center py-8">
-                <svg class="w-16 h-16 text-gray-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                </svg>
-                <p class="text-gray-600 text-base">لا توجد أحداث انضباط</p>
-                <p class="text-gray-500 text-xs mt-1">لم يتم تسجيل أي تقارير أو مجالس انضباط حتى الآن</p>
-            </div>
+                <div class="text-center py-8">
+                    <svg class="w-16 h-16 text-gray-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                    <p class="text-gray-600 text-base">لا توجد أحداث انضباط</p>
+                    <p class="text-gray-500 text-xs mt-1">لم يتم تسجيل أي تقارير أو مجالس أو إجراءات حتى الآن</p>
+                </div>
             @endif
         </div>
     </div>
 
     <style>
         @media (max-width: 768px) {
-            .container {
-                padding-left: 0.75rem;
-                padding-right: 0.75rem;
-            }
-            
-            .p-3 {
-                padding: 0.75rem;
-            }
-            
-            .p-4 {
-                padding: 1rem;
-            }
-            
-            .space-y-4 > * + * {
-                margin-top: 1rem;
-            }
-            
-            .text-xl {
-                font-size: 1.25rem;
-            }
-            
-            .text-lg {
-                font-size: 1.125rem;
-            }
-            
-            .text-base {
-                font-size: 1rem;
-            }
+            .container { padding-left: .75rem; padding-right: .75rem; }
+            .p-3 { padding: .75rem; } .p-4 { padding: 1rem; }
+            .space-y-4 > * + * { margin-top: 1rem; }
+            .text-xl { font-size: 1.25rem; } .text-lg { font-size: 1.125rem; } .text-base { font-size: 1rem; }
         }
-        
         @media (max-width: 480px) {
-            .container {
-                padding-left: 0.5rem;
-                padding-right: 0.5rem;
-            }
-            
-            .p-3 {
-                padding: 0.5rem;
-            }
-            
-            .p-4 {
-                padding: 0.75rem;
-            }
-            
-            .text-xl {
-                font-size: 1.125rem;
-            }
-            
-            .text-lg {
-                font-size: 1rem;
-            }
-            
-            .text-base {
-                font-size: 0.875rem;
-            }
+            .container { padding-left: .5rem; padding-right: .5rem; }
+            .p-3 { padding: .5rem; } .p-4 { padding: .75rem; }
+            .text-xl { font-size: 1.125rem; } .text-lg { font-size: 1rem; } .text-base { font-size: .875rem; }
         }
     </style>
 </body>

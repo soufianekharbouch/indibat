@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تسجيل الدخول - إنضباط</title>
     <script src="https://cdn.tailwindcss.com"></script>
+     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap');
         body {
-            font-family: 'Noto Naskh Arabic', serif;
+            font-family: 'Tajawal', serif;
         }
     </style>
 </head>
@@ -19,13 +20,13 @@
         <div class="mb-8 text-center">
             <img src="{{ asset('assets/logo.png') }}" 
                  alt="شعار المؤسسة" 
-                 class="bg-transparent mx-auto w-4/5 max-w-[140px] h-auto mb-4">
+                 class="bg-transparent mx-auto w-4/5 max-w-[220px] h-auto mb-4">
         </div>
 
         <div class="max-w-md w-full space-y-6">
             <!-- En-tête -->
             <div class="text-center">
-                <h1 class="text-4xl font-bold text-gray-900 mb-2">تسجيل الدخول</h1>
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">تسجيل الدخول</h1>
                 <p class="text-lg text-gray-600">نظام إدارة الانضباط المدرسي</p>
             </div>
             

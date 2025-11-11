@@ -21,10 +21,12 @@ class Rapport extends Model
         'points_retires'
     ];
 
+
     protected $casts = [
         'comportements' => 'array',
         'date_seance' => 'date',
-        'points_retires' => 'decimal:2'
+        'points_retires' => 'decimal:2',
+        'vu_par_admin' => 'boolean'
     ];
 
     // Événement pour recalculer les points si les comportements changent

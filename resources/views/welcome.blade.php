@@ -5,10 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>إنضباط - نظام إدارة الانضباط</title>
     <script src="https://cdn.tailwindcss.com"></script>
+      <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap');
         body {
-            font-family: 'Noto Naskh Arabic', serif;
+            font-family: 'Tajawal', serif;
         }
     </style>
 </head>
@@ -19,12 +21,12 @@
         <div class="mb-10 text-center">
             <img src="{{ asset('assets/logo.png') }}" 
                  alt="شعار المؤسسة" 
-                 class="bg-transparent mx-auto w-4/5 max-w-[260px] h-auto">
+                 class="bg-transparent mx-auto w-4/5 max-w-[220px] h-auto">
         </div>
 
         <!-- Logo et Header -->
         <div class="text-center mb-8">
-            <h1 class="text-5xl font-bold text-gray-900 mb-4">نظام إدارة الانضباط المدرسي</h1>
+            <h3 class="text-2xl font-bold text-gray-900 mb-4">نظام إدارة الانضباط المدرسي</h3>
         </div>
         
         <!-- Bouton de connexion -->

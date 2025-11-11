@@ -121,7 +121,17 @@
                         </td>
                         <td class="px-4 py-4">
                             <div class="flex flex-col gap-2">
-                                <!-- Bouton pour créer un conseil -->
+                                @if(auth()->user()->isMotasarrif())
+                                <a href="{{ route('decisions.create', $eleve->id) }}"
+                                class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-2 rounded-lg transition duration-200 flex items-center justify-center gap-1 whitespace-nowrap"
+                                title="اتخاذ إجراء إداري">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8 12h.01M12 12h.01M16 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    اتخاذ إجراء إداري
+                                </a>
+                                @else
                                 <a href="{{ route('conseils.create', $eleve->id) }}" 
                                    class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded text-xs font-medium transition duration-200 flex items-center justify-center gap-1 whitespace-nowrap"
                                    title="عقد مجلس تأديبي">
@@ -130,7 +140,7 @@
                                     </svg>
                                     مجلس
                                 </a>
-                                
+                                @endif
                             </div>
                         </td>
                     </tr>
